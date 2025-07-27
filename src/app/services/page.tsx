@@ -1,7 +1,7 @@
 // app/services/page.tsx
 "use client";
 import { motion } from "framer-motion";
-import ServiceCard from "@/components/ServiceCard";
+import ServiceCard from "@/components/ui/ServiceCard";
 import PageHeader from "@/components/PageHeader";
 
 const services = [

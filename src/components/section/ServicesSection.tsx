@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import ServiceCard from "@/components/ServiceCard";
+import ServiceCard from "@/components/ui/ServiceCard";
 import { Button } from "@/components/ui/button";
 
 const services = [
