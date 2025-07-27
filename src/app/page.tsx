@@ -8,7 +8,7 @@ import HeroSection from "@/components/section/HeroSection";
 import FeaturesSection from "@/components/section/FeaturesSection";
 import ServicesSection from "@/components/section/ServicesSection";
 import CTASection from "@/components/section/CTASection";
-import FloatingButtons from "@/components/FloatingButton";
+import FloatingButtons from "@/components/ui/FloatingButton";
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
