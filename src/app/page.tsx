@@ -32,8 +32,7 @@ export default function Home() {
   }, []);
 
   return (
-      
-      <main className="relative z-10 min-h-screen bg-transparent text-white font-sans overflow-hidden">
+      <main className="h-screen overflow-y-scroll snap-y snap-mandatory text-white font-sans relative z-10 bg-black overflow-y-scroll scrollbar-hide">
         <ParticlesBackground />
         <LoadingSplash isVisible={isVisible} />
         <HeroSection />

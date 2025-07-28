@@ -30,13 +30,15 @@ const services = [
 
 export default function ServicesSection() {
   return (
-    <section className="relative z-10 py-24 bg-transparent text-white">
-      <div className="max-w-5xl mx-auto px-6 text-center mb-12">
+    <section className="relative z-10 w-full min-h-screen snap-start flex flex-col justify-center bg-transparent text-white py-24 px-6">
+      <div className="max-w-5xl mx-auto text-center mb-12">
         <h2 className="text-3xl font-bold mb-4">我们的服务</h2>
-        <p className="text-gray-400">从品牌曝光到业务系统，我们为你量身打造。</p>
+        <p className="text-gray-400">
+          从品牌曝光到业务系统，我们为你量身打造。
+        </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto px-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto w-full">
         {services.map((s, i) => (
           <motion.div
             key={s.slug}
@@ -45,12 +47,16 @@ export default function ServicesSection() {
             transition={{ delay: i * 0.2 }}
             viewport={{ once: true }}
           >
-            <ServiceCard title={s.title} desc={s.desc} href={`/services/${s.slug}`} />
+            <ServiceCard
+              title={s.title}
+              desc={s.desc}
+              href={`/services/${s.slug}`}
+            />
           </motion.div>
         ))}
       </div>
 
-      <div className="text-center mt-10">
+      <div className="text-center mt-12">
         <Link href="/services">
           <Button className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full px-6 py-3 text-sm">
             查看所有服务 →
