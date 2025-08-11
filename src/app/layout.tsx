@@ -30,7 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {children}
           </main>
 
-          <Footer />
+          {/*<Footer /> Combine to SampleProject Section*/}
         </div>
       </body>
     </html>

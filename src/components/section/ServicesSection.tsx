@@ -38,7 +38,7 @@ export default function ServicesSection() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto w-full">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto w-full min-h-5xl">
         {services.map((s, i) => (
           <motion.div
             key={s.slug}

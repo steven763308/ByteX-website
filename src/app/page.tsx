@@ -7,6 +7,7 @@ import LoadingSplash from "@/components/LoadingSplash";
 import HeroSection from "@/components/section/HeroSection";
 import FeaturesSection from "@/components/section/FeaturesSection";
 import ServicesSection from "@/components/section/ServicesSection";
+import SampleProject from "@/components/section/SampleProject";
 import CTASection from "@/components/section/CTASection";
 import FloatingButtons from "@/components/ui/FloatingButton";
 
@@ -47,7 +48,8 @@ export default function Home() {
 
       <FeaturesSection />
       <ServicesSection />
-      <CTASection />
+      <SampleProject />
+      
 
       <FloatingButtons />
     </main>

@@ -13,7 +13,7 @@ export default function Navbar() {
   const navLinks = [
     { label: "Home", href: "/" },
     { label: "Features", href: "/#features" }, // ⚠️ anchor link not active-detectable
-    { label: "Services", href: "/services" },
+    { label: "Services", href: "/#services" },
     { label: "Contact", href: "/#contact" },
   ];
 

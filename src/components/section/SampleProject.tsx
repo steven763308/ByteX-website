@@ -1,231 +1,260 @@
-// components/section/SampleProject.tsx
 "use client";
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import Footer from "@/components/Footer";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
 
 type Project = {
   title: string;
   desc: string;
   image: string;
-  tags: string[];
   href: string;
+  tags?: string[];
 };
 
-const projects: Project[] = [
+const FOOTER_H = 520; //according Footer height(px)
+
+const projectsData: Project[] = [
   {
-    title: "Sky Consultancy — 官网页面重构",
-    desc: "极简落地页 + 多语言支持，提升转化率与加载速度。",
+    title: "Sky Consultancy — 官网页重构",
+    desc: "极简落地页 + 多语言，专注转化。",
     image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1600&auto=format&fit=crop",
-    tags: ["Landing Page", "i18n", "Next.js"],
     href: "/cases/sky-consultancy",
+    tags: ["Next.js", "i18n"],
   },
   {
-    title: "UAS — 产品目录与后台管理",
-    desc: "可筛选产品目录、动态分类、后台 CMS 管理。",
+    title: "UAS — 目录与后台",
+    desc: "可筛选目录 + CMS 管理。",
     image: "https://images.unsplash.com/photo-1529101091764-c3526daf38fe?q=80&w=1600&auto=format&fit=crop",
-    tags: ["CMS", "Dashboard", "CRUD"],
     href: "/cases/uas",
+    tags: ["CMS", "Dashboard"],
   },
   {
-    title: "Alpha Capital — 交易记录系统",
-    desc: "可视化策略表现、导入导出、图表分析。",
+    title: "Alpha Capital — 交易系统",
+    desc: "策略可视化与导出分析。",
     image: "https://images.unsplash.com/photo-1543286386-2e659306cd6c?q=80&w=1600&auto=format&fit=crop",
-    tags: ["DataViz", "Charts", "Export"],
     href: "/cases/alpha-capital",
+    tags: ["Charts", "DataViz"],
   },
   {
     title: "Swift Apply — 快速申请门户",
-    desc: "标准化表单、自动化通知、移动端优先。",
+    desc: "标准化表单，自动化通知。",
     image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1600&auto=format&fit=crop",
-    tags: ["Form", "Automation", "Mobile First"],
     href: "/cases/swift-apply",
+    tags: ["Automation", "Forms"],
   },
   {
-    title: "ByteX — 品牌站点/动效",
-    desc: "粒子背景、动效组件、渐变美学统一。",
-    image: "https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=1600&auto=format&fit=crop",
-    tags: ["Motion", "UI", "Brand"],
+    title: "ByteX — 动效品牌站",
+    desc: "粒子背景与统一渐变美学。",
+    image: "",
     href: "/cases/bytex",
+    tags: ["Motion", "UI"],
   },
-  // 需要 6~8 个就继续加即可
 ];
 
 const AUTOPLAY_MS = 4200;
 
-export default function SampleProjectsSection() {
-  const viewportRef = useRef<HTMLDivElement | null>(null);
+function mod(n: number, m: number) {
+  return ((n % m) + m) % m;
+}
+
+export default function CoverflowProjectsSection({
+  projects = projectsData,
+  title = "Selected Projects",
+  subtitle = "精选项目案例（持续更新）",
+}: {
+  projects?: Project[];
+  title?: string;
+  subtitle?: string;
+}) {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  const len = projects.length;
 
-  // 平滑滚到目标卡
-  const scrollToIndex = (i: number) => {
-    const el = viewportRef.current;
-    if (!el) return;
-    const cards = el.querySelectorAll<HTMLDivElement>("[data-card]");
-    const target = cards[i];
-    if (!target) return;
-    el.scrollTo({ left: target.offsetLeft - el.offsetLeft, behavior: "smooth" });
-  };
-
-  const next = () => setIndex((i) => (i + 1) % projects.length);
-  const prev = () => setIndex((i) => (i - 1 + projects.length) % projects.length);
-
-  // 自动播放（悬停暂停、标签隐藏时暂停）
+  // 自动播放
   useEffect(() => {
-    if (paused) return;
-    const id = setInterval(next, AUTOPLAY_MS);
+    if (paused || len <= 1) return;
+    const id = setInterval(() => setIndex((i) => (i + 1) % len), AUTOPLAY_MS);
     return () => clearInterval(id);
-  }, [paused]);
+  }, [paused, len]);
 
-  // 当 index 变化时滚动
-  useEffect(() => {
-    scrollToIndex(index);
-  }, [index]);
-
-  // 监听用户手动滚动 -> 同步当前 index
-  useEffect(() => {
-    const el = viewportRef.current;
-    if (!el) return;
-
-    const onScroll = () => {
-      const cards = el.querySelectorAll<HTMLDivElement>("[data-card]");
-      let nearest = 0;
-      let minDelta = Number.POSITIVE_INFINITY;
-      cards.forEach((c, i) => {
-        const delta = Math.abs(c.offsetLeft - el.scrollLeft);
-        if (delta < minDelta) {
-          minDelta = delta;
-          nearest = i;
-        }
-      });
-      setIndex(nearest);
-    };
-
-    let frame = 0;
-    const handler = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(onScroll);
-    };
-
-    el.addEventListener("scroll", handler, { passive: true });
-    return () => {
-      el.removeEventListener("scroll", handler);
-      cancelAnimationFrame(frame);
-    };
+  // 拖拽（鼠标/触控）
+  const dragRef = useRef<{ startX: number; dragging: boolean }>({ startX: 0, dragging: false });
+  const onPointerDown = useCallback((e: React.PointerEvent) => {
+    dragRef.current.dragging = true;
+    dragRef.current.startX = e.clientX;
   }, []);
+  const onPointerMove = useCallback(
+    (e: React.PointerEvent) => {
+      if (!dragRef.current.dragging) return;
+      const dx = e.clientX - dragRef.current.startX;
+      if (Math.abs(dx) > 40) {
+        setIndex((i) => (i + (dx < 0 ? 1 : -1) + len) % len);
+        dragRef.current.dragging = false;
+      }
+    },
+    [len]
+  );
+  const onPointerUp = useCallback(() => {
+    dragRef.current.dragging = false;
+  }, []);
+
+  // 生成 coverflow 视图：当前项置中，左右各 2 张做预览
+  const visible = useMemo(() => {
+    const arr = [];
+    const radius = Math.min(2, Math.floor((len - 1) / 2)); // 左右最多 2 张
+    for (let offset = -radius; offset <= radius; offset++) {
+      arr.push(mod(index + offset, len));
+    }
+    return arr;
+  }, [index, len]);
+
+  const next = () => setIndex((i) => (i + 1) % len);
+  const prev = () => setIndex((i) => (i - 1 + len) % len);
 
   return (
     <section
       id="projects"
-      className="relative z-10 w-full min-h-[80vh] snap-start flex flex-col justify-center bg-transparent text-white py-24 px-6"
+      className="relative z-10 w-full min-h-[90vh] snap-start flex flex-col justify-center bg-transparent text-white py-24"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
       {/* 标题 */}
-      <div className="text-center mb-12">
-        <h2 className="text-3xl font-bold">Sample Projects</h2>
-        <p className="text-gray-400 mt-2 text-sm">近期项目案例（持续更新）</p>
+      <div className="container mx-auto px-6 text-center mb-12">
+        <h2 className="text-3xl font-bold">{title}</h2>
+        <p className="text-gray-400 mt-2 text-sm">{subtitle}</p>
       </div>
 
-      {/* 视口 */}
+      {/* 舞台区域 */}
       <div className="relative">
-        {/* 左右渐变遮罩，提升质感 */}
-        <div aria-hidden className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#0f0f0f] to-transparent" />
-        <div aria-hidden className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-[#0f0f0f] to-transparent" />
+        {/* 左右柔光遮罩 */}
+        <div aria-hidden className="pointer-events-none absolute inset-y-0 left-0 w-40 bg-gradient-to-r from-[#0f0f0f] to-transparent" />
+        <div aria-hidden className="pointer-events-none absolute inset-y-0 right-0 w-40 bg-gradient-to-l from-[#0f0f0f] to-transparent" />
 
-        {/* 横向滚动容器（自动吸附） */}
+        {/* Coverflow 轨道 */}
         <div
-          ref={viewportRef}
-          className="scrollbar-hide flex gap-6 overflow-x-auto snap-x snap-mandatory px-1 pb-2"
+          className="relative mx-auto max-w-[1200px] px-6"
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerLeave={onPointerUp}
         >
-          {projects.map((p, i) => (
-            <article
-              key={p.title}
-              data-card
-              className="snap-start shrink-0 w-[88%] sm:w-[70%] md:w-[46%] lg:w-[38%] xl:w-[32%]"
+          <div className="relative h-[440px] md:h-[520px]">
+            {visible.map((idx) => {
+              const p = projects[idx];
+              // 计算相对位置（-2,-1,0,1,2）
+              const rel = ((idx - index + len) % len);
+              const signed =
+                rel === 0 ? 0 :
+                rel <= len / 2 ? rel : rel - len; // 映射到负数区间，保持左右对称
+
+              // 基于相对距离设置样式
+              const distance = Math.abs(signed);
+              const isCenter = distance === 0;
+
+              const translateX = signed * 160; // 卡片水平偏移
+              const rotateY = signed * -12;    // 轻微透视
+              const scale = isCenter ? 1 : 0.86 - distance * 0.06;
+              const opacity = isCenter ? 1 : 0.60 - distance * 0.1;
+              const z = 50 - distance;         // 层级
+
+              return (
+                <article
+                  key={`${idx}-${p.title}`}
+                  className="absolute top-1/2 left-1/2 will-change-transform"
+                  style={{
+                    transform: `translate(-50%, -50%) translateX(${translateX}px) scale(${scale}) rotateY(${rotateY}deg)`,
+                    zIndex: z,
+                    opacity,
+                    transition: "transform 600ms cubic-bezier(.22,1,.22,1), opacity 400ms",
+                    transformStyle: "preserve-3d",
+                  }}
+                >
+                  <div className={`group relative w-[78vw] sm:w-[560px] md:w-[640px] lg:w-[720px] rounded-2xl border border-white/12 overflow-hidden backdrop-blur
+                                   ${isCenter ? "bg-white/[0.06] shadow-[0_0_40px_rgba(127,90,240,.25)]" : "bg-white/[0.04]"}`}>
+                    {/* 封面 */}
+                    <div className="relative aspect-[16/9]">
+                      <Image
+                        src={p.image}
+                        alt={p.title}
+                        fill
+                        className="object-cover"
+                        sizes="(min-width: 1024px) 720px, (min-width: 768px) 640px, (min-width: 640px) 560px, 78vw"
+                        priority={isCenter}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
+                      {/* 右上角标签 */}
+                      {p.tags && p.tags.length > 0 && (
+                        <div className="absolute top-3 right-3 flex gap-2">
+                          {p.tags.slice(0, 2).map((t) => (
+                            <span key={t} className="rounded-full bg-black/60 border border-white/15 px-2 py-0.5 text-[11px] text-white/80">
+                              {t}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 文案 */}
+                    <div className="p-5">
+                      <h3 className="text-lg font-semibold">{p.title}</h3>
+                      <p className="mt-2 text-sm text-white/70 line-clamp-2">{p.desc}</p>
+                      <div className="mt-4 flex items-center justify-between">
+                        <Link
+                          href={p.href}
+                          className={`inline-flex items-center gap-1 text-sm rounded-full px-3 py-1.5 transition
+                                      ${isCenter ? "border border-white/20 hover:border-white/30 bg-white/[0.06]" : "border border-white/10 hover:border-white/20"}`}
+                        >
+                          查看案例 <ExternalLink className="w-4 h-4" />
+                        </Link>
+                        <div className="text-[11px] text-white/45">#{idx + 1}/{len}</div>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+
+          {/* 控制按钮 */}
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-between">
+            <button
+              onClick={prev}
+              className="pointer-events-auto inline-flex items-center justify-center rounded-full border border-white/15 bg-black/50 backdrop-blur w-10 h-10 hover:border-white/30 hover:bg-black/70 transition"
+              aria-label="Prev"
             >
-              <div className="group relative rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur overflow-hidden hover:border-white/20 transition-all">
-                {/* 封面图 */}
-                <div className="relative aspect-[16/10] overflow-hidden">
-                  <Image
-                    src={p.image}
-                    alt={p.title}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-[1.05]"
-                    sizes="(min-width: 1280px) 32vw, (min-width: 1024px) 38vw, (min-width: 768px) 46vw, 88vw"
-                    priority={i < 2}
-                  />
-                  {/* 角标标签 */}
-                  <div className="absolute top-3 left-3 flex flex-wrap gap-2">
-                    {p.tags.slice(0, 3).map((t) => (
-                      <span
-                        key={t}
-                        className="rounded-full bg-black/60 border border-white/15 px-2 py-0.5 text-[11px] text-white/80"
-                      >
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* 文案 & CTA */}
-                <div className="p-5">
-                  <h3 className="text-lg font-semibold">{p.title}</h3>
-                  <p className="mt-2 text-sm text-white/70 line-clamp-2">{p.desc}</p>
-
-                  <div className="mt-4 flex items-center justify-between">
-                    <Link
-                      href={p.href}
-                      className="inline-flex items-center gap-1 text-sm rounded-full border border-white/15 px-3 py-1.5 hover:border-white/30 hover:bg-white/[0.06] transition"
-                    >
-                      查看案例 <ExternalLink className="w-4 h-4" />
-                    </Link>
-                    {/* 次级标签（可选） */}
-                    {p.tags[3] && (
-                      <span className="text-[11px] text-white/50">{p.tags[3]}</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
-
-        {/* 控制按钮 */}
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-between px-1">
-          <button
-            onClick={prev}
-            className="pointer-events-auto inline-flex items-center justify-center rounded-full border border-white/15 bg-black/50 backdrop-blur w-10 h-10 hover:border-white/30 hover:bg-black/70 transition"
-            aria-label="Prev"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <button
-            onClick={next}
-            className="pointer-events-auto inline-flex items-center justify-center rounded-full border border-white/15 bg-black/50 backdrop-blur w-10 h-10 hover:border-white/30 hover:bg-black/70 transition"
-            aria-label="Next"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button
+              onClick={next}
+              className="pointer-events-auto inline-flex items-center justify-center rounded-full border border-white/15 bg-black/50 backdrop-blur w-10 h-10 hover:border-white/30 hover:bg-black/70 transition"
+              aria-label="Next"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* 圆点指示器 */}
-      <div className="mt-6 flex items-center justify-center gap-2">
+      {/* 圆点 */}
+      <div className="mt-8 flex items-center justify-center gap-2">
         {projects.map((_, i) => (
           <button
             key={i}
             onClick={() => setIndex(i)}
-            className={`h-1.5 rounded-full transition-all ${
-              i === index ? "w-6 bg-white" : "w-2 bg-white/30 hover:bg-white/60"
-            }`}
-            aria-label={`Go to slide ${i + 1}`}
+            className={`h-1.5 rounded-full transition-all ${i === index ? "w-6 bg-white" : "w-2 bg-white/30 hover:bg-white/60"}`}
+            aria-label={`Go to ${i + 1}`}
           />
         ))}
       </div>
+
+      {/*Footer*/}
+      <div style={{height: FOOTER_H}}>
+        <Footer />
+      </div>
+
     </section>
   );
 }
