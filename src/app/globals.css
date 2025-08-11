@@ -1,35 +1,67 @@
+/* ===== Tailwind v4 ===== */
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+/* ========= Base（根变量 & 重置） ========= */
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #ffffff;
+    --foreground: #171717;
+    --font-sans: var(--font-geist-sans);
+    --font-mono: var(--font-geist-mono);
   }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --background: #0a0a0a;
+      --foreground: #ededed;
+    }
+  }
+
+  /* 让背景能真正“铺满”，并清除默认间距 */
+  html, body, #__next, #root { height: 100%; }
+  html, body { margin: 0; padding: 0; }
+
+  /* 视口滚动：把 scroll-snap 放在视口，而不是内部容器 */
+  html, body {
+    scroll-snap-type: y mandatory;   /* ⬅️ 全页纵向吸附 */
+  }
+
+  /* 全站字体与基础色（背景色从 layout.tsx 控制即可，这里透明） */
+  body {
+    background-color: transparent;
+    color: var(--foreground);
+    font-family: var(--font-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+      Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    /* 防止横向出现 1px 溢出造成的第二个滚动条 */
+    overflow-x: hidden;
+  }
+
+  /* 每个 section 吸附对齐到顶部 */
+  section { scroll-snap-align: start; }
 }
 
-body {
-  background-color: transparent;
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
+/* ========= Utilities（滚动条控制） ========= */
+@layer utilities {
+  /* 全站隐藏滚动条 —— Chrome / Edge / Safari */
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
 
-/* globals.css */
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.hide-scrollbar {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;     /* Firefox */
+  /* 全站隐藏滚动条 —— Firefox */
+  html, body { scrollbar-width: none; }  /* 隐藏 */
+  /* IE/旧 Edge 兼容 */
+  body { -ms-overflow-style: none; }
+
+  /* 可选：任何元素想隐藏滚动条时用这个类 */
+  .scrollbar-hide::-webkit-scrollbar { width: 0; height: 0; }
+  .scrollbar-hide { scrollbar-width: none; -ms-overflow-style: none; }
+
+  /* 反向：如果你在某个容器里临时想显示滚动条，用这个类覆盖 */
+  .scrollbar-default::-webkit-scrollbar { width: 8px; height: 8px; }
+  .scrollbar-default { scrollbar-width: auto; -ms-overflow-style: auto; }
 }

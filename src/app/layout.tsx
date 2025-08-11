@@ -15,15 +15,18 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="zh-CN">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#0f0f0f] text-white`}>
-        {/* 让整页用列布局，Footer 能贴底 */}
-        <div className="min-h-dvh flex flex-col">
-          {/* 建议 Navbar 自己内部做 sticky：sticky top-0 z-50 + 背景/毛玻璃 */}
+    <html lang="zh-CN" className="scroll-smooth">
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#0f0f0f] text-white
+                    min-h-[100dvh] overflow-x-hidden`}
+      >
+        {/* 整页列布局，确保 Footer 贴底且全页只出现一个滚动条 */}
+        <div className="min-h-[100dvh] flex flex-col">
+          {/* Navbar 固定在顶部（或在组件里 sticky） */}
           <Navbar />
 
-          {/* 主体占满剩余高度；不要再用 pt-5 硬撑高度 */}
-          <main className="flex-1">
+          {/* 如果 Navbar 是固定高度 ~64px，就给 main 让位 */}
+          <main className="flex-1 pt-16 relative">
             {children}
           </main>
 

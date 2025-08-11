@@ -21,25 +21,35 @@ export default function Home() {
       setIsVisible(false);
       return;
     }
-
     const timeout = setTimeout(() => {
       setLoading(false);
       setIsVisible(false);
       localStorage.setItem("hasLoaded", "true");
     }, 3000);
-
     return () => clearTimeout(timeout);
   }, []);
 
   return (
-      <main className="h-screen overflow-y-scroll snap-y snap-mandatory text-white font-sans relative z-10 bg-black overflow-y-scroll scrollbar-hide">
+    // ❌ 不要给 main：h-screen / overflow-y-scroll
+    // ✅ 让 main 交给 layout 的 flex-1 管高度，页面用“视口滚动”
+    <main className="flex-1 relative z-10 text-white font-sans">
+      {/* 背景层放绝对定位，避免把页面高度撑炸 */}
+      <div className="pointer-events-none absolute inset-0 -z-10">
         <ParticlesBackground />
-        <LoadingSplash isVisible={isVisible} />
+      </div>
+
+      <LoadingSplash isVisible={isVisible} />
+
+      {/* Hero 用 min-h，而不是 h-screen */}
+      <section className="relative min-h-[calc(100dvh-64px)] flex items-center">
         <HeroSection />
-        <FeaturesSection />
-        <ServicesSection />
-        <CTASection />
-        <FloatingButtons />
-      </main>
+      </section>
+
+      <FeaturesSection />
+      <ServicesSection />
+      <CTASection />
+
+      <FloatingButtons />
+    </main>
   );
 }
