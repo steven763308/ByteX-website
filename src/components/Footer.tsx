@@ -29,7 +29,7 @@ export default function Footer() {
             </div>
             <div className="flex gap-3">
               <Link
-                href="https://wa.me/6xxxxxxxxx" // TODO: 你的 WhatsApp
+                href="https://wa.me/60149763308" // TODO: 你的 WhatsApp
                 className="rounded-xl px-4 py-2 bg-violet-500 hover:bg-violet-600 transition"
               >
                 WhatsApp 咨询
@@ -120,6 +120,8 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 border-t border-white/10 py-6 text-xs text-white/60">
           <div>
             © {year} ByteX Technology. All rights reserved.
+            <br/>
+            SSM: 003763553-H
             {/* TODO: 等 SSM 下来了这里放：SSM: XXXXXXXXX-X */}
           </div>
           <div className="flex items-center gap-4">
