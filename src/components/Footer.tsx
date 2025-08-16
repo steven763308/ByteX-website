@@ -120,8 +120,6 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 border-t border-white/10 py-6 text-xs text-white/60">
           <div>
             © {year} ByteX Technology. All rights reserved.
-            <br/>
-            SSM: 003763553-H
             {/* TODO: 等 SSM 下来了这里放：SSM: XXXXXXXXX-X */}
           </div>
           <div className="flex items-center gap-4">

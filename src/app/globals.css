@@ -17,6 +17,16 @@
     }
   }
 
+  /* only show when PC or devices with cursor */
+  @media (pointer:fine){
+    html, body {cursor: none;}
+  }
+
+  /*off animation: when user enable less motion*/
+  @media (prefers-reduced-motion: reduce){
+    .cursor-smooth {transition: none !important;}
+  }
+
   /* 让背景能真正“铺满”，并清除默认间距 */
   html, body, #__next, #root { height: 100%; }
   html, body { margin: 0; padding: 0; }

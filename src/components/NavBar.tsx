@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
+import ThemeToggle from "./ui/ThemeToggle";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -42,10 +43,11 @@ export default function Navbar() {
         </nav>
 
         {/* CTA Button */}
-        <div className="hidden md:block">
+        <div className="hidden md:flex items-center gap-x-3">
           <Button className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-4 py-2 rounded-full text-sm">
             Connect Wallet
           </Button>
+          <ThemeToggle />
         </div>
 
         {/* Mobile menu toggle */}

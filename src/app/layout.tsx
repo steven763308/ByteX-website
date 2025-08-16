@@ -3,7 +3,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/NavBar";
-import Footer from "@/components/Footer";
+import CustomCursor from "@/components/ui/CustomCursor";
+import Providers from "./providers";
+//import Footer from "@/components/Footer";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -20,6 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#0f0f0f] text-white
                     min-h-[100dvh] overflow-x-hidden`}
       >
+        <Providers>
         {/* 整页列布局，确保 Footer 贴底且全页只出现一个滚动条 */}
         <div className="min-h-[100dvh] flex flex-col">
           {/* Navbar 固定在顶部（或在组件里 sticky） */}
@@ -32,6 +35,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
           {/*<Footer /> Combine to SampleProject Section*/}
         </div>
+        <CustomCursor />
+        </Providers>
       </body>
     </html>
   );
