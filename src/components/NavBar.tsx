@@ -2,20 +2,54 @@
 
 import { useEffect, useState, useId } from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Sun, Moon, Globe } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
 const navItems = [
-  { href: "/", label: "Home" },
-  { href: "/about", label: "About Us" },
-  { href: "/services", label: "Services" },
-  { href: "/portfolio", label: "Portfolio" },
-  { href: "/contact", label: "Contact Us" },
+  { href: "/", label: { en: "Home", zh: "首页" } },
+  { href: "/about", label: { en: "About Us", zh: "关于我们" } },
+  { href: "/services", label: { en: "Services", zh: "服务" } },
+  { href: "/portfolio", label: { en: "Portfolio", zh: "作品" } },
+  { href: "/contact", label: { en: "Contact Us", zh: "联系我们" } },
 ];
+
+// 读取系统 prefers-color-scheme
+function getSystemTheme(): "light" | "dark" {
+  if (typeof window === "undefined") return "light";
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const menuId = useId();
+
+  // 语言 zh / en
+  const [lang, setLang] = useState<"en" | "zh">("en");
+  // 主题 dark / light
+  const [theme, setTheme] = useState<"light" | "dark">(getSystemTheme());
+
+  // 初始化：从 localStorage 读语言与主题；主题应用到 <html>
+  useEffect(() => {
+    const storedLang = (localStorage.getItem("lang") as "en" | "zh") || null;
+    const storedTheme = (localStorage.getItem("theme") as "light" | "dark") || null;
+
+    if (storedLang) setLang(storedLang);
+    if (storedTheme) setTheme(storedTheme);
+  }, []);
+
+  // 应用主题到 <html>，并存储
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === "dark") root.classList.add("dark");
+    else root.classList.remove("dark");
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  // 语言变化：存储并广播（方便其它组件/页面监听更新）
+  useEffect(() => {
+    localStorage.setItem("lang", lang);
+    window.dispatchEvent(new CustomEvent("langchange", { detail: lang }));
+  }, [lang]);
 
   // 打开菜单时禁止页面滚动 + Esc 关闭
   useEffect(() => {
@@ -34,93 +68,151 @@ export default function Navbar() {
     };
   }, [open]);
 
-return (
-  <>
-    {/* 顶部导航条（透明、白色、左右两角） */}
-    <header className="fixed inset-x-0 top-0 z-50 bg-transparent border-none">
-      <nav className="flex h-14 w-full items-center justify-between px-6">
-        {/* 左：Logo（白色） */}
-        <Link
-          href="/"
-          className="text-lg font-semibold tracking-wide text-white hover:opacity-80"
-          onClick={() => setOpen(false)}
-        >
-          BYTE Logo
-        </Link>
+  // 切换语言
+  const toggleLang = () => setLang((p) => (p === "en" ? "zh" : "en"));
+  // 切换主题
+  const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
 
-        {/* 右：汉堡按钮（白色） */}
-        <button
-          aria-controls={menuId}
-          aria-expanded={open}
-          aria-label={open ? "Close menu" : "Open menu"}
-          onClick={() => setOpen((v) => !v)}
-          className="inline-flex items-center justify-center rounded-md p-2 text-white"
-        >
-          {open ? <X size={22} /> : <Menu size={22} />}
-        </button>
-      </nav>
-    </header>
+  // 顶栏右侧的按钮样式（透明白字）
+  const topBtn =
+    "inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm text-white/90 hover:text-white hover:bg-white/10 transition";
 
-    {/* 顶部下落的全屏菜单 */}
-    <AnimatePresence>
-      {open && (
-        <motion.aside
-          id={menuId}
-          initial={{ y: "-100%", opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: "-100%", opacity: 0 }}
-          transition={{ type: "spring", stiffness: 210, damping: 26 }}
-          className="fixed inset-0 z-40 flex h-screen w-screen flex-col bg-neutral-100/95 backdrop-blur dark:bg-neutral-900/95"
-          role="dialog"
-          aria-modal="true"
-          onMouseDown={(e) => {
-            if (e.currentTarget === e.target) setOpen(false);
-          }}
-        >
-          {/* 顶部栏（LOGO + 关闭） */}
-          <div className="flex h-14 items-center justify-between border-b border-black/10 px-4 dark:border-white/10">
-            <span className="text-base font-semibold tracking-wide text-black/70 dark:text-white/80">
-              BYTE Logo
-            </span>
+  return (
+    <>
+      {/* 顶部导航条（透明） */}
+      <header className="fixed inset-x-0 top-0 z-50 bg-transparent border-none">
+        <nav className="flex h-14 w-full items-center justify-between px-6">
+          {/* 左：Logo（白色） */}
+          <Link
+            href="/"
+            className="text-lg font-semibold tracking-wide text-white hover:opacity-80"
+            onClick={() => setOpen(false)}
+          >
+            BYTE Logo
+          </Link>
+
+          {/* 右：语言 & 主题 & 汉堡 */}
+          <div className="flex items-center gap-1">
+            {/* 语言切换 */}
             <button
-              aria-label="Close menu"
-              onClick={() => setOpen(false)}
-              className="rounded-md p-2"
+              aria-label="Toggle language"
+              onClick={toggleLang}
+              className={topBtn}
+              title={lang === "en" ? "切换到中文" : "Switch to English"}
             >
-              <X size={22} />
+              <Globe size={16} />
+              <span className="uppercase">{lang}</span>
+            </button>
+
+            {/* 主题切换 */}
+            <button
+              aria-label="Toggle theme"
+              onClick={toggleTheme}
+              className={topBtn}
+              title={theme === "dark" ? "切换为浅色" : "切换为深色"}
+            >
+              {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+              <span className="hidden sm:inline">
+                {theme === "dark" ? (lang === "en" ? "Light" : "浅色") : (lang === "en" ? "Dark" : "深色")}
+              </span>
+            </button>
+
+            {/* 汉堡按钮 */}
+            <button
+              aria-controls={menuId}
+              aria-expanded={open}
+              aria-label={open ? "Close menu" : "Open menu"}
+              onClick={() => setOpen((v) => !v)}
+              className="inline-flex items-center justify-center rounded-md p-2 text-white"
+            >
+              {open ? <X size={22} /> : <Menu size={22} />}
             </button>
           </div>
+        </nav>
+      </header>
 
-          {/* 中间导航列表 */}
-          <div className="flex flex-1 items-center justify-center">
-            <motion.ul
-              initial="hidden"
-              animate="show"
-              variants={{
-                hidden: { transition: { staggerChildren: 0.05, staggerDirection: -1 } },
-                show: { transition: { staggerChildren: 0.06 } },
-              }}
-              className="flex flex-col items-center gap-6"
-            >
-              {navItems.map((item) => (
-                <motion.li
-                  key={item.href}
-                  variants={{ hidden: { y: 8, opacity: 0 }, show: { y: 0, opacity: 1 } }}
+      {/* 顶部下落的全屏菜单 */}
+      <AnimatePresence>
+        {open && (
+          <motion.aside
+            id={menuId}
+            initial={{ y: "-100%", opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: "-100%", opacity: 0 }}
+            transition={{ type: "spring", stiffness: 210, damping: 26 }}
+            className="fixed inset-0 z-40 flex h-screen w-screen flex-col bg-neutral-100/95 backdrop-blur dark:bg-neutral-900/95"
+            role="dialog"
+            aria-modal="true"
+            onMouseDown={(e) => {
+              if (e.currentTarget === e.target) setOpen(false);
+            }}
+          >
+            {/* 顶部栏（LOGO + 快捷切换 + 关闭） */}
+            <div className="flex h-14 items-center justify-between border-b border-black/10 px-4 dark:border-white/10">
+              <span className="text-base font-semibold tracking-wide text-black/70 dark:text-white/80">
+                BYTE Logo
+              </span>
+              <div className="flex items-center gap-1">
+                {/* 语言切换（菜单内） */}
+                <button
+                  aria-label="Toggle language"
+                  onClick={toggleLang}
+                  className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm hover:bg-black/5 dark:hover:bg-white/10"
                 >
-                  <Link
-                    href={item.href}
-                    onClick={() => setOpen(false)}
-                    className="text-center text-2xl font-large tracking-wide text-black hover:opacity-90 dark:text-white"
+                  <Globe size={16} />
+                  <span className="uppercase">{lang}</span>
+                </button>
+
+                {/* 主题切换（菜单内） */}
+                <button
+                  aria-label="Toggle theme"
+                  onClick={toggleTheme}
+                  className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm hover:bg-black/5 dark:hover:bg-white/10"
+                >
+                  {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+                  <span>{theme === "dark" ? (lang === "en" ? "Light" : "浅色") : (lang === "en" ? "Dark" : "深色")}</span>
+                </button>
+
+                <button
+                  aria-label="Close menu"
+                  onClick={() => setOpen(false)}
+                  className="rounded-md p-2"
+                >
+                  <X size={22} />
+                </button>
+              </div>
+            </div>
+
+            {/* 中间导航列表 */}
+            <div className="flex flex-1 items-center justify-center">
+              <motion.ul
+                initial="hidden"
+                animate="show"
+                variants={{
+                  hidden: { transition: { staggerChildren: 0.05, staggerDirection: -1 } },
+                  show: { transition: { staggerChildren: 0.06 } },
+                }}
+                className="flex flex-col items-center gap-6"
+              >
+                {navItems.map((item) => (
+                  <motion.li
+                    key={item.href}
+                    variants={{ hidden: { y: 8, opacity: 0 }, show: { y: 0, opacity: 1 } }}
                   >
-                    {item.label}
-                  </Link>
-                </motion.li>
-              ))}
-            </motion.ul>
-          </div>
-        </motion.aside>
-      )}
-    </AnimatePresence>
-  </>
-);
+                    <Link
+                      href={item.href}
+                      onClick={() => setOpen(false)}
+                      className="text-center text-2xl font-medium tracking-wide text-black hover:opacity-90 dark:text-white"
+                    >
+                      {item.label[lang]}
+                    </Link>
+                  </motion.li>
+                ))}
+              </motion.ul>
+            </div>
+          </motion.aside>
+        )}
+      </AnimatePresence>
+    </>
+  );
 }
