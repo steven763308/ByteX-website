@@ -12,31 +12,16 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 
 export const metadata: Metadata = {
   title: "ByteX Technology",
-  description: "Futuristic Web3 Builder",
+  description: "Futuristic Websites and Systems",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="zh-CN" className="scroll-smooth">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#0f0f0f] text-white
-                    min-h-[100dvh] overflow-x-hidden`}
-      >
-        <Providers>
-        {/* 整页列布局，确保 Footer 贴底且全页只出现一个滚动条 */}
-        <div className="min-h-[100dvh] flex flex-col">
-          {/* Navbar 固定在顶部（或在组件里 sticky） */}
-          <Navbar />
-
-          {/* 如果 Navbar 是固定高度 ~64px，就给 main 让位 */}
-          <main className="flex-1 pt-16 relative">
-            {children}
-          </main>
-
-          {/*<Footer /> Combine to SampleProject Section*/}
-        </div>
-        <CustomCursor />
-        </Providers>
+    <html lang="en" className="scroll-smooth">
+      <body className="bg-white text-black antialiased dark:bg-black dark:text-white">
+        <Navbar />
+        {/* 留出导航高度 */}
+        <div className="pt-14">{children}</div>
       </body>
     </html>
   );

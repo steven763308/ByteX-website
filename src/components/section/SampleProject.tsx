@@ -48,7 +48,7 @@ const projectsData: Project[] = [
   {
     title: "ByteX — 动效品牌站",
     desc: "粒子背景与统一渐变美学。",
-    image: "",
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1600&auto=format&fit=crop",
     href: "/cases/bytex",
     tags: ["Motion", "UI"],
   },
