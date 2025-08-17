@@ -22,6 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Navbar />
         {/* 留出导航高度 */}
         <div className="pt-14">{children}</div>
+        <CustomCursor />
       </body>
     </html>
   );

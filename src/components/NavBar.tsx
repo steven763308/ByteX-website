@@ -88,7 +88,7 @@ export default function Navbar() {
             className="text-lg font-semibold tracking-wide text-white hover:opacity-80"
             onClick={() => setOpen(false)}
           >
-            BYTE Logo
+            ByteX
           </Link>
 
           {/* 右：语言 & 主题 & 汉堡 */}
@@ -149,8 +149,8 @@ export default function Navbar() {
           >
             {/* 顶部栏（LOGO + 快捷切换 + 关闭） */}
             <div className="flex h-14 items-center justify-between border-b border-black/10 px-4 dark:border-white/10">
-              <span className="text-base font-semibold tracking-wide text-black/70 dark:text-white/80">
-                BYTE Logo
+              <span className="glow-text text-base font-semibold tracking-wide text-black/80 dark:text-white [--glow:rgba(99,102,241,.6)] dark:[--glow:rgba(168,85,247,.6)] hover:[--glow:rgba(99,102,241,1)] dark:hover:[--glow:rgba(168,85,247,1)]">
+                ByteX
               </span>
               <div className="flex items-center gap-1">
                 {/* 语言切换（菜单内） */}

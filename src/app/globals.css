@@ -20,6 +20,7 @@
   /* only show when PC or devices with cursor */
   @media (pointer:fine){
     html, body {cursor: none;}
+    .cursor-none * {cursor: none !important}
   }
 
   /*off animation: when user enable less motion*/
