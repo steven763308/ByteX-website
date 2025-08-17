@@ -28,16 +28,18 @@ export default function Navbar() {
   // 主题 dark / light
   const [theme, setTheme] = useState<"light" | "dark">(getSystemTheme());
 
-  // 初始化：从 localStorage 读语言与主题；主题应用到 <html>
+  //Right bottom Home Button
+  const [showTop, setShowTop] = useState(false);
+
+  // 初始化：从 localStorage 读语言与主题
   useEffect(() => {
     const storedLang = (localStorage.getItem("lang") as "en" | "zh") || null;
     const storedTheme = (localStorage.getItem("theme") as "light" | "dark") || null;
-
     if (storedLang) setLang(storedLang);
     if (storedTheme) setTheme(storedTheme);
   }, []);
 
-  // 应用主题到 <html>，并存储
+  // 应用主题到 <html>
   useEffect(() => {
     const root = document.documentElement;
     if (theme === "dark") root.classList.add("dark");
@@ -45,7 +47,7 @@ export default function Navbar() {
     localStorage.setItem("theme", theme);
   }, [theme]);
 
-  // 语言变化：存储并广播（方便其它组件/页面监听更新）
+  // 语言变化：存储并广播
   useEffect(() => {
     localStorage.setItem("lang", lang);
     window.dispatchEvent(new CustomEvent("langchange", { detail: lang }));
@@ -68,70 +70,95 @@ export default function Navbar() {
     };
   }, [open]);
 
+  //monitor scrolling, if yes display right bottom home button
+  useEffect(()=>{
+    const onScroll = () => setShowTop(window.scrollY > 120);
+    onScroll();
+    window.addEventListener("scroll", onScroll, {passive: true});
+    return() => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   // 切换语言
   const toggleLang = () => setLang((p) => (p === "en" ? "zh" : "en"));
   // 切换主题
   const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
 
-  // 顶栏右侧的按钮样式（透明白字）
+  //Scroll back to top
+  const scrollToTop = () => window.scrollTo({top:0, behavior:"smooth"});
+
+  // 顶栏右侧按钮样式
   const topBtn =
     "inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm text-white/90 hover:text-white hover:bg-white/10 transition";
 
   return (
     <>
-      {/* 顶部导航条（透明） */}
-      <header className="fixed inset-x-0 top-0 z-50 bg-transparent border-none">
-        <nav className="flex h-14 w-full items-center justify-between px-6">
-          {/* 左：Logo（白色） */}
-          <Link
-            href="/"
-            className="text-lg font-semibold tracking-wide text-white hover:opacity-80"
-            onClick={() => setOpen(false)}
+      {/* 顶部导航条：在菜单打开时隐藏 */}
+      <AnimatePresence initial={false}>
+        {!open && (
+          <motion.header
+            key="navbar"
+            initial={{ y: 0, opacity: 1 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -20, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 260, damping: 24 }}
+            className="fixed inset-x-0 top-0 z-50 bg-transparent border-none"
           >
-            ByteX
-          </Link>
+            <nav className="flex h-14 w-full items-center justify-between px-6">
+              {/* 左：Logo */}
+              <Link
+                href="/"
+                className="text-lg font-semibold tracking-wide text-white hover:opacity-80"
+                onClick={() => setOpen(false)}
+              >
+                ByteX
+              </Link>
 
-          {/* 右：语言 & 主题 & 汉堡 */}
-          <div className="flex items-center gap-1">
-            {/* 语言切换 */}
-            <button
-              aria-label="Toggle language"
-              onClick={toggleLang}
-              className={topBtn}
-              title={lang === "en" ? "切换到中文" : "Switch to English"}
-            >
-              <Globe size={16} />
-              <span className="uppercase">{lang}</span>
-            </button>
+              {/* 右：语言 & 主题 & 汉堡 */}
+              <div className="flex items-center gap-1">
+                <button
+                  aria-label="Toggle language"
+                  onClick={toggleLang}
+                  className={topBtn}
+                  title={lang === "en" ? "切换到中文" : "Switch to English"}
+                >
+                  <Globe size={16} />
+                  <span className="uppercase">{lang}</span>
+                </button>
 
-            {/* 主题切换 */}
-            <button
-              aria-label="Toggle theme"
-              onClick={toggleTheme}
-              className={topBtn}
-              title={theme === "dark" ? "切换为浅色" : "切换为深色"}
-            >
-              {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
-              <span className="hidden sm:inline">
-                {theme === "dark" ? (lang === "en" ? "Light" : "浅色") : (lang === "en" ? "Dark" : "深色")}
-              </span>
-            </button>
+                <button
+                  aria-label="Toggle theme"
+                  onClick={toggleTheme}
+                  className={topBtn}
+                  title={theme === "dark" ? "切换为浅色" : "切换为深色"}
+                >
+                  {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+                  <span className="hidden sm:inline">
+                    {theme === "dark"
+                      ? lang === "en"
+                        ? "Light"
+                        : "浅色"
+                      : lang === "en"
+                      ? "Dark"
+                      : "深色"}
+                  </span>
+                </button>
 
-            {/* 汉堡按钮 */}
-            <button
-              aria-controls={menuId}
-              aria-expanded={open}
-              aria-label={open ? "Close menu" : "Open menu"}
-              onClick={() => setOpen((v) => !v)}
-              className="inline-flex items-center justify-center rounded-md p-2 text-white"
-            >
-              {open ? <X size={22} /> : <Menu size={22} />}
-            </button>
-          </div>
-        </nav>
-      </header>
+                <button
+                  aria-controls={menuId}
+                  aria-expanded={open}
+                  aria-label={open ? "Close menu" : "Open menu"}
+                  onClick={() => setOpen((v) => !v)}
+                  className="inline-flex items-center justify-center rounded-md p-2 text-white"
+                >
+                  {open ? <X size={22} /> : <Menu size={22} />}
+                </button>
+              </div>
+            </nav>
+          </motion.header>
+        )}
+      </AnimatePresence>
 
-      {/* 顶部下落的全屏菜单 */}
+      {/* 全屏菜单 */}
       <AnimatePresence>
         {open && (
           <motion.aside
@@ -153,7 +180,6 @@ export default function Navbar() {
                 ByteX
               </span>
               <div className="flex items-center gap-1">
-                {/* 语言切换（菜单内） */}
                 <button
                   aria-label="Toggle language"
                   onClick={toggleLang}
@@ -163,14 +189,21 @@ export default function Navbar() {
                   <span className="uppercase">{lang}</span>
                 </button>
 
-                {/* 主题切换（菜单内） */}
                 <button
                   aria-label="Toggle theme"
                   onClick={toggleTheme}
                   className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm hover:bg-black/5 dark:hover:bg-white/10"
                 >
                   {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
-                  <span>{theme === "dark" ? (lang === "en" ? "Light" : "浅色") : (lang === "en" ? "Dark" : "深色")}</span>
+                  <span>
+                    {theme === "dark"
+                      ? lang === "en"
+                        ? "Light"
+                        : "浅色"
+                      : lang === "en"
+                      ? "Dark"
+                      : "深色"}
+                  </span>
                 </button>
 
                 <button
@@ -213,6 +246,35 @@ export default function Navbar() {
           </motion.aside>
         )}
       </AnimatePresence>
+
+      {/* 固定右下角 Home 按钮 */}
+      <AnimatePresence>
+        {showTop && !open && (
+          <motion.button
+            key="scroll-top"
+            onClick={scrollToTop}
+            aria-label="Back to top"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 40 }}
+            transition={{ type: "spring", stiffness: 260, damping: 20 }}
+            className="fixed bottom-6 right-6 z-50 rounded-full bg-indigo-600 p-3 text-white shadow-lg hover:bg-indigo-700 focus:outline-none"
+          >
+            {/* 上箭头动画 */}
+            <motion.span
+              animate={{ y: [0, -4, 0] }}
+              transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
+              className="inline-flex"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 19V5" />
+                <path d="m5 12 7-7 7 7" />
+              </svg>
+            </motion.span>
+          </motion.button>
+        )}
+      </AnimatePresence>
+
     </>
   );
 }
