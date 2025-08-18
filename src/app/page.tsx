@@ -5,9 +5,10 @@ import { useEffect, useState } from "react";
 import ParticlesBackground from "@/components/ParticlesBackground";
 import LoadingSplash from "@/components/LoadingSplash";
 import HeroSection from "@/components/section/HeroSection";
+import AboutusSection from "@/components/section/AboutusSection";
 import FeaturesSection from "@/components/section/FeaturesSection";
 import ServicesSection from "@/components/section/ServicesSection";
-import SampleProject from "@/components/section/SampleProject";
+import SampleProject from "@/components/section/PortfolioSection";
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
@@ -43,7 +44,7 @@ export default function Home() {
       <section className="relative min-h-[calc(100dvh-64px)] flex items-center">
         <HeroSection />
       </section>
-
+      <AboutusSection />
       <FeaturesSection />
       <ServicesSection />
       <SampleProject />

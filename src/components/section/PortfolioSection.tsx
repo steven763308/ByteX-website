@@ -62,7 +62,7 @@ function mod(n: number, m: number) {
 
 export default function CoverflowProjectsSection({
   projects = projectsData,
-  title = "Selected Projects",
+  title = "Portfolio",
   subtitle = "精选项目案例（持续更新）",
 }: {
   projects?: Project[];

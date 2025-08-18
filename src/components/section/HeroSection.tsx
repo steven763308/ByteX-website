@@ -22,7 +22,7 @@ export default function HeroSection() {
         transition={{ delay: 0.2, duration: 0.8 }}
       >
         <p className="text-base md:text-lg text-gray-400 max-w-xl">
-          专注打造 Landing Page、公司官网与定制系统，迈向 Web3 的起点
+          专注打造数字资产如 Landing Page、公司官网到定制系统，我们为企业构建数字化品牌门面，开启迈向未来的第一步，体验科技的无限可能。
         </p>
       </motion.div>
 
@@ -33,7 +33,7 @@ export default function HeroSection() {
         transition={{ delay: 0.4, duration: 0.8 }}
       >
         <Button className="relative group bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-indigo-600 hover:to-purple-600 text-white px-6 py-3 rounded-full text-lg overflow-hidden">
-          <span className="relative z-10">开始打造网站</span>
+          <span className="relative z-10">开始打造数字资产</span>
           <span className="absolute inset-0 bg-white opacity-10 group-hover:animate-pulse"></span>
         </Button>
       </motion.div>
