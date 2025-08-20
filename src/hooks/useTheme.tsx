@@ -7,9 +7,7 @@ export type Theme = "light" | "dark";
 export type ThemeMode = "light" | "dark" | "system";
 
 const STORAGE_KEY = "themeMode";
-
-// SSR 安全：在服务端渲染时不要触发布局抖动
-const useIsomorphicEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
+const useIsoEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 function getSystemTheme(): Theme {
   if (typeof window === "undefined") return "light";
@@ -27,15 +25,15 @@ export default function useTheme() {
   const [themeMode, setThemeMode] = useState<ThemeMode>("system");
   const [theme, setTheme] = useState<Theme>(getSystemTheme());
 
-  // 初始化：读取本地存储
-  useIsomorphicEffect(() => {
+  // init
+  useIsoEffect(() => {
     try {
       const stored = (localStorage.getItem(STORAGE_KEY) as ThemeMode) || "system";
       setThemeMode(stored);
     } catch {}
   }, []);
 
-  // 根据 themeMode 计算实际 theme，并应用到 <html>
+  // compute + apply
   useEffect(() => {
     let mql: MediaQueryList | null = null;
 
@@ -47,8 +45,6 @@ export default function useTheme() {
     if (themeMode === "system") {
       const sys = getSystemTheme();
       apply(sys);
-
-      // 监听系统变化
       mql = window.matchMedia("(prefers-color-scheme: dark)");
       const onChange = () => apply(mql!.matches ? "dark" : "light");
       mql.addEventListener("change", onChange);
@@ -58,7 +54,7 @@ export default function useTheme() {
     }
   }, [themeMode]);
 
-  // 持久化 + 跨 Tab 同步
+  // persist + cross-tab sync
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, themeMode);
@@ -67,17 +63,13 @@ export default function useTheme() {
 
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {
-      if (e.key === STORAGE_KEY && e.newValue) {
-        setThemeMode(e.newValue as ThemeMode);
-      }
+      if (e.key === STORAGE_KEY && e.newValue) setThemeMode(e.newValue as ThemeMode);
     };
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);
   }, []);
 
-  const toggleTheme = () => {
-    setThemeMode((prev) => (prev === "dark" ? "light" : "dark"));
-  };
+  const toggleTheme = () => setThemeMode((p) => (p === "dark" ? "light" : "dark"));
 
   return { themeMode, theme, setThemeMode, toggleTheme };
 }

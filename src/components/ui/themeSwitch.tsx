@@ -1,16 +1,14 @@
 "use client";
-
 import { useEffect, useRef, useState } from "react";
 import { Sun, Moon, Monitor } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-//import { useTheme } from "@/hooks/useTheme"; // ← 使用你的自定义 Hook
+import useTheme from "@/hooks/useTheme";
 
 export default function ThemeSwitcher() {
   const { themeMode, theme, setThemeMode, toggleTheme } = useTheme();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  // 点击外部关闭
   useEffect(() => {
     const handle = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
@@ -31,7 +29,7 @@ export default function ThemeSwitcher() {
         aria-haspopup="listbox"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        onDoubleClick={toggleTheme} // 小彩蛋：双击主按钮在 Light/Dark 间切换
+        onDoubleClick={toggleTheme}
         className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm text-white/90 hover:text-white hover:bg-white/10 transition"
       >
         {theme === "dark" ? <Moon size={16} /> : <Sun size={16} />}
@@ -55,10 +53,7 @@ export default function ThemeSwitcher() {
                 <button
                   role="option"
                   aria-selected={themeMode === opt.mode}
-                  onClick={() => {
-                    setThemeMode(opt.mode);
-                    setOpen(false);
-                  }}
+                  onClick={() => { setThemeMode(opt.mode); setOpen(false); }}
                   className={`w-full text-left flex items-center gap-2 px-2 py-2 rounded-md hover:bg-white/10 ${
                     themeMode === opt.mode ? "bg-white/10" : ""
                   }`}
@@ -66,9 +61,7 @@ export default function ThemeSwitcher() {
                   {opt.icon}
                   <span>{opt.label}</span>
                   {opt.mode === "system" && (
-                    <span className="ml-auto text-xs text-white/50">
-                      Now: {theme}
-                    </span>
+                    <span className="ml-auto text-xs text-white/50">Now: {theme}</span>
                   )}
                 </button>
               </li>

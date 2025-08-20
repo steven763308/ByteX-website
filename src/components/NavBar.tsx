@@ -157,8 +157,13 @@ export default function Navbar() {
                 ByteX
               </span>
               <div className="flex items-center gap-1">
+              <span className="">
                 <LangSwitcher />
+              </span>
+              <span className="">
                 <ThemeSwitcher />
+              </span>
+                
 
                 <button
                   aria-label="Close menu"
