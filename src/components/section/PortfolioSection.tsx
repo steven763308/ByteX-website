@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import Footer from "@/components/Footer";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
 
@@ -13,8 +12,6 @@ type Project = {
   href: string;
   tags?: string[];
 };
-
-const FOOTER_H = 520; //according Footer height(px)
 
 const projectsData: Project[] = [
   {
@@ -249,12 +246,6 @@ export default function CoverflowProjectsSection({
           />
         ))}
       </div>
-
-      {/*Footer*/}
-      <div style={{height: FOOTER_H}}>
-        <Footer />
-      </div>
-
     </section>
   );
 }

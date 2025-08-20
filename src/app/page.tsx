@@ -5,10 +5,12 @@ import { useEffect, useState } from "react";
 import ParticlesBackground from "@/components/ParticlesBackground";
 import LoadingSplash from "@/components/LoadingSplash";
 import HeroSection from "@/components/section/HeroSection";
-import AboutusSection from "@/components/section/AboutusSection";
-import FeaturesSection from "@/components/section/FeaturesSection";
+import WhyUsSection from "@/components/section/WhyUsSection";
+import WhyBuiltIt from "@/components/section/WhyBuiltItSection";
+import ProductFeaturesSection from "@/components/section/ProductFeaturesSection";
 import ServicesSection from "@/components/section/ServicesSection";
 import SampleProject from "@/components/section/PortfolioSection";
+import CTASection from "@/components/section/CTASection";
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
@@ -44,10 +46,12 @@ export default function Home() {
       <section className="relative min-h-[calc(100dvh-64px)] flex items-center">
         <HeroSection />
       </section>
-      <AboutusSection />
-      <FeaturesSection />
+      <WhyBuiltIt />
+      <WhyUsSection />
+      <ProductFeaturesSection />
       <ServicesSection />
       <SampleProject />
+      <CTASection />
           
     </main>
   );
