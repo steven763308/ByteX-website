@@ -4,6 +4,8 @@ import { useEffect, useState, useId } from "react";
 import Link from "next/link";
 import { Menu, X, Sun, Moon, Globe } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
+import LangSwitcher from "@/components/ui/langSwitch";
+import ThemeSwitcher from "@/components/ui/themeSwitch";
 
 const navItems = [
   { href: "/", label: { en: "Home", zh: "首页" } },
@@ -115,33 +117,8 @@ export default function Navbar() {
 
               {/* 右：语言 & 主题 & 汉堡 */}
               <div className="flex items-center gap-1">
-                <button
-                  aria-label="Toggle language"
-                  onClick={toggleLang}
-                  className={topBtn}
-                  title={lang === "en" ? "切换到中文" : "Switch to English"}
-                >
-                  <Globe size={16} />
-                  <span className="uppercase">{lang}</span>
-                </button>
-
-                <button
-                  aria-label="Toggle theme"
-                  onClick={toggleTheme}
-                  className={topBtn}
-                  title={theme === "dark" ? "切换为浅色" : "切换为深色"}
-                >
-                  {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
-                  <span className="hidden sm:inline">
-                    {theme === "dark"
-                      ? lang === "en"
-                        ? "Light"
-                        : "浅色"
-                      : lang === "en"
-                      ? "Dark"
-                      : "深色"}
-                  </span>
-                </button>
+                <LangSwitcher />
+                <ThemeSwitcher />
 
                 <button
                   aria-controls={menuId}
@@ -180,31 +157,8 @@ export default function Navbar() {
                 ByteX
               </span>
               <div className="flex items-center gap-1">
-                <button
-                  aria-label="Toggle language"
-                  onClick={toggleLang}
-                  className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm hover:bg-black/5 dark:hover:bg-white/10"
-                >
-                  <Globe size={16} />
-                  <span className="uppercase">{lang}</span>
-                </button>
-
-                <button
-                  aria-label="Toggle theme"
-                  onClick={toggleTheme}
-                  className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm hover:bg-black/5 dark:hover:bg-white/10"
-                >
-                  {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
-                  <span>
-                    {theme === "dark"
-                      ? lang === "en"
-                        ? "Light"
-                        : "浅色"
-                      : lang === "en"
-                      ? "Dark"
-                      : "深色"}
-                  </span>
-                </button>
+                <LangSwitcher />
+                <ThemeSwitcher />
 
                 <button
                   aria-label="Close menu"

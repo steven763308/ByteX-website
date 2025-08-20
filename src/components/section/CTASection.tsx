@@ -4,8 +4,6 @@ import { motion } from "framer-motion";
 import { ArrowRight, Phone, Mail } from "lucide-react";
 import Footer from "@/components/Footer";
 
-const FOOTER_H = 520; //according Footer height(px)
-
 export default function CTASection() {
   return (
     <section
@@ -74,8 +72,8 @@ export default function CTASection() {
         免费提供初步诊断与方向建议，帮助你确认第一步如何开始。
       </motion.p>
 
-      {/*Footer*/}
-      <div style={{height: FOOTER_H}}>
+      {/* Footer 放在 CTA 的后半部分，不要写固定高度 */}
+      <div className="w-full mt-16 border-t border-white/10">
         <Footer />
       </div>
     </section>

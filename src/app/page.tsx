@@ -52,7 +52,7 @@ export default function Home() {
       <ServicesSection />
       <SampleProject />
       <CTASection />
-          
+      
     </main>
   );
 }
